@@ -271,6 +271,24 @@ Giả sử byte `/` (`0x2f`) bị cấm, nhưng bạn cần chuỗi `"/bin/sh"`.
     mov rdi, rsp
     ```
 
+* **Thay thế `mov` bằng `push/pop` để không tạo ra REX prefix:**
+  ```nasm
+  ; Thay vì: mov rdi, rax (Mã máy: 48 89 c7 -> Dính H-byte)
+  push rax
+  pop rdi           ; (Mã máy: 50 5f -> Sạch H-byte)
+  ```
+
+* **Lấy địa chỉ Stack (RSP) mà không dính 0x48:**
+  ```nasm
+  ; Thay vì: mov rsi, rsp (Mã máy: 48 89 e6 -> Dính H-byte)
+  push rsp
+  pop rsi           ; (Mã máy: 54 5e -> Sạch H-byte)
+  ```
+
+> **Lưu ý:** Kỹ thuật này không chỉ giúp né H-byte mà còn giữ trọn vẹn giá trị 64-bit của thanh ghi, tránh lỗi Segmentation Fault do bị cắt cụt địa chỉ khi thao tác trên các thanh ghi 32-bit (eax, esp, edi...).
+
+---
+
 ### B. Mã Tự Sửa Đổi (Self-Modifying Code)
 
 Nếu shellcode của bạn được nạp vào một vùng nhớ có quyền ghi (`PROT_WRITE`), bạn có thể viết một đoạn code tự thay đổi chính nó khi chạy. Kỹ thuật này cực kỳ mạnh để bypass các filter phức tạp.
