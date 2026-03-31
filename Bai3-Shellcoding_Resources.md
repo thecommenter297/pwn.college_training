@@ -287,6 +287,19 @@ Giả sử byte `/` (`0x2f`) bị cấm, nhưng bạn cần chuỗi `"/bin/sh"`.
 
 > **Lưu ý:** Kỹ thuật này không chỉ giúp né H-byte mà còn giữ trọn vẹn giá trị 64-bit của thanh ghi, tránh lỗi Segmentation Fault do bị cắt cụt địa chỉ khi thao tác trên các thanh ghi 32-bit (eax, esp, edi...).
 
+* **Lợi dụng lệnh call để đẩy địa chỉ của 1 chuỗi lên stack:**
+```nasm
+.intel_syntax noprefix
+.global _start
+
+_start:
+    jmp get_flag_addr       # Nhảy xuống cuối để lấy địa chỉ chuỗi
+after_flag:
+    pop rdi                 # Lấy địa chỉ "/flag" từ stack vào rdi (mã máy: 5f)
+get_flag_addr:
+    call after_flag         # Đẩy địa chỉ "/flag" lên stack bằng lệnh call và quay lại sau lệnh jmp
+    .string "/flag"
+```
 ---
 
 ### B. Mã Tự Sửa Đổi (Self-Modifying Code)
