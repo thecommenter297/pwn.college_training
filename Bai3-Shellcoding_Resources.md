@@ -321,9 +321,15 @@ _start:
     mov byte ptr [rbx], 0x0f      # Ghi byte đầu tiên của syscall
     mov byte ptr [rbx+1], 0x05    # Ghi byte thứ hai
     
-    # ... chuẩn bị các thanh ghi cho execve ...
+    # ... Đoạn code của bạn để chuẩn bị các thanh ghi cho lệnh syscall ...
+
 
     call rbx # Dùng để gọi syscall
+
+    # exit sau khi thực hiện
+    mov rax, 60
+    xor rdi, rdi
+    jmp rbx # Dùng jmp thay vì call do không cần push thêm lệnh nào đằng sau vào stack để quay lại nữa
 return:
         ret
 syscall_instruction:
