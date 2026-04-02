@@ -312,7 +312,7 @@ Giả sử lệnh `syscall` (`0f 05`) bị cấm.
 ```asm
 .intel_syntax noprefix
 
-.section .text.writable,"awx" # Yêu cầu linker cấp quyền Writable+Executable
+.section .shellcode,"awx" # Yêu cầu linker cấp quyền Writable+Executable
 .global _start
 _start:
     lea rdi, [rip+syscall_instruction]
