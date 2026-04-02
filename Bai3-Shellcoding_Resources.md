@@ -296,7 +296,9 @@ _start:
     jmp get_flag_addr       # Nhảy xuống cuối để lấy địa chỉ chuỗi
 after_flag:
     pop rdi                 # Lấy địa chỉ "/flag" từ stack vào rdi (mã máy: 5f)
-    # Phần còn lại của shellcode mà bạn sẽ viết bắt đầu ở đây
+    # Phần còn lại của shellcode mà bạn sẽ viết bắt đầu ở đây:
+
+
 get_flag_addr:
     call after_flag         # Đẩy địa chỉ "/flag" lên stack bằng lệnh call
     .string "/flag"
