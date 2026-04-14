@@ -31,6 +31,12 @@ scp -i <đường dẫn đến file key ở máy bạn> hacker@dojo.pwn.college:
 scp -i key hacker@dojo.pwn.college:/challenge/syscall-shenanigans .
 ```
 
+*Tải full file challenge và các file libcapstone về máy để chạy*
+```shell
+
+```
+
+
 #### Giải nén:
 ```shell
 unzip file.zip
