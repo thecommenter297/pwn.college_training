@@ -416,6 +416,7 @@ Trong một hệ thống hiện đại, các vùng nhớ được phân chia quy
 Ta có thể sử dụng các "macros" hoặc lệnh nhảy (`jmp`) để di chuyển địa điểm thực thi shellcode ra khỏi vùng bị hạn chế.
 
 **Hướng 1: Sử dụng Macro/Directives (`.rept`)**
+
 Giả sử chương trình có lệnh cấm thực thi ở 4096 byte đầu tiên. Cách này sẽ "lấp đầy" 4096 byte đầu bằng các lệnh vô hại (`nop`), khiến đoạn code thực sự của bạn bị đẩy xuống vùng nhớ phía sau.
 
 **shellcode.s:**
@@ -445,6 +446,7 @@ _start:
 ---
 
 **Hướng 2: Sử dụng Lệnh Nhảy Offset (`jmp`)**
+
 Thay vì tạo file ELF khổng lồ, ta chỉ cần một lệnh nhảy duy nhất ở đầu để "bay" qua vùng bị khóa. Cách này chuyên nghiệp và tiết kiệm dung lượng hơn.
 
 **shellcode.s:**
