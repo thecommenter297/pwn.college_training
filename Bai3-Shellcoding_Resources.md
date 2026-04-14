@@ -425,7 +425,7 @@ Giả sử chương trình có lệnh cấm thực thi ở 4096 byte đầu tiê
 .global _start
 
 _start:
-    # 1. Dùng Directive để tạo 4096 byte NOP
+    # 1. Dùng macro để sinh ra 4096 byte lệnh NOP
     .rept 4096
     nop
     .endr
