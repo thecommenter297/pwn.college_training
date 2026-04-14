@@ -415,9 +415,6 @@ Trong một hệ thống hiện đại, các vùng nhớ được phân chia quy
 
 Ta có thể sử dụng các "macros" hoặc lệnh nhảy (`jmp`) để di chuyển địa điểm thực thi shellcode ra khỏi vùng bị hạn chế.
 
-## 2. Giải pháp: "Đưa mã vào vùng an toàn"
-Mục tiêu là đẩy đoạn code thực thi của chúng ta xuống sau byte thứ **4096** (vùng vẫn còn quyền **RWX**).
-
 **Hướng 1: Sử dụng Macro/Directives (`.rept`)**
 Giả sử chương trình có lệnh cấm thực thi ở 4096 byte đầu tiên. Cách này sẽ "lấp đầy" 4096 byte đầu bằng các lệnh vô hại (`nop`), khiến đoạn code thực sự của bạn bị đẩy xuống vùng nhớ phía sau.
 
