@@ -351,15 +351,15 @@ Khi các ràng buộc về kích thước hoặc ký tự cấm quá khắc nghi
     Ví dụ về stager đọc từ `stdin` (fd=0) vào chính vị trí hiện tại (`rip`):
 
     ```asm
-    ; A minimal stager, assuming we can get rip
-    ; syscall read(0, rip, 1000)
-    xor rax, rax            ; rax = 0 (syscall read)
-    xor rdi, rdi            ; rdi = 0 (fd=stdin)
-    lea rsi, [rip]          ; rsi = current instruction pointer
-    mov rdx, 1000           ; rdx = number of bytes to read
-    syscall                 ; Execute read()
+    # A minimal stager, assuming we can get rip
+    # syscall read(0, rip, 1000)
+    xor rax, rax            
+    xor rdi, rdi            
+    lea rsi, [rip]          
+    mov rdx, 1000           
+    syscall                 
     
-    ; Stage 2 shellcode starts from here...
+    # Stage 2 shellcode starts from here...
     ```
     Payload này sẽ đọc Stage 2 từ `stdin` và ghi đè lên chính nó, sau đó CPU sẽ tiếp tục thực thi Stage 2.
 
