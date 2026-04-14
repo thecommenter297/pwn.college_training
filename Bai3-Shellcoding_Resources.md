@@ -409,7 +409,73 @@ Trong một hệ thống hiện đại, các vùng nhớ được phân chia quy
 
 ### B. Các Hướng Tấn Công Để Vượt Qua NX/DEP
 
-#### 1. Return-Oriented Programming (ROP) - Tái Sử Dụng Mã Lệnh
+#### 1. Bỏ qua vùng cấm thực thi
+
+Đôi khi chương trình thực thi các cơ chế kiểm soát vùng nhớ (như `mprotect`) để cấm quyền Write/Execute trên một phân đoạn nhất định nhưng lại bỏ sót hoặc nới lỏng ở các phân đoạn khác trong cùng một vùng cấp phát.
+
+Ta có thể sử dụng các "macros" hoặc lệnh nhảy (`jmp`) để di chuyển địa điểm thực thi shellcode ra khỏi vùng bị hạn chế.
+
+## 2. Giải pháp: "Đưa mã vào vùng an toàn"
+Mục tiêu là đẩy đoạn code thực thi của chúng ta xuống sau byte thứ **4096** (vùng vẫn còn quyền **RWX**).
+
+**Hướng 1: Sử dụng Macro/Directives (`.rept`)**
+Giả sử chương trình có lệnh cấm thực thi ở 4096 byte đầu tiên. Cách này sẽ "lấp đầy" 4096 byte đầu bằng các lệnh vô hại (`nop`), khiến đoạn code thực sự của bạn bị đẩy xuống vùng nhớ phía sau.
+
+**shellcode.s:**
+```assembly
+.intel_syntax noprefix
+.global _start
+
+_start:
+    # 1. Dùng Directive để tạo 4096 byte NOP
+    .rept 4096
+    nop
+    .endr
+
+    # 2. Bắt đầu code thực tế (Lúc này RIP đã > 0x1000)
+    lea rbx, [rip + 2]       # rbx trỏ tới vị trí của 2 byte 0x00 00 bên dưới
+    mov byte ptr [rbx], 0x0f # Ghi đè syscall (Hợp lệ vì vùng này RWX)
+    mov byte ptr [rbx + 1], 0x05
+    
+    # 3. Thực thi syscall đã được "vá"
+    xor rax, rax             # Ví dụ: Syscall read
+    # ... code còn lại ...
+    
+    .byte 0x00, 0x00         # Chỗ trống để vá syscall
+```
+
+
+---
+
+**Hướng 2: Sử dụng Lệnh Nhảy Offset (`jmp`)**
+Thay vì tạo file ELF khổng lồ, ta chỉ cần một lệnh nhảy duy nhất ở đầu để "bay" qua vùng bị khóa. Cách này chuyên nghiệp và tiết kiệm dung lượng hơn.
+
+**shellcode.s:**
+```assembly
+.intel_syntax noprefix
+.global _start
+
+_start:
+    # 1. Nhảy thẳng tới offset an toàn (ví dụ 0x1100)
+    jmp offset_safe
+
+    # 2. Dùng .org để ép trình biên dịch đặt code tại vị trí mong muốn
+    .org 0x1100
+    
+offset_safe:
+    # 3. Thực hiện SMC như bình thường
+    lea rbx, [rip + 2]
+    mov byte ptr [rbx], 0x0f
+    mov byte ptr [rbx + 1], 0x05
+    
+    # ... setup syscall arguments (rdi, rsi, rdx...) ...
+    
+    .byte 0x00, 0x00         # Placeholder
+```
+
+---
+
+#### 2. Return-Oriented Programming (ROP) - Tái Sử Dụng Mã Lệnh
 
 Đây là kỹ thuật phổ biến và mạnh mẽ nhất để bypass NX. Thay vì tự viết và tiêm mã thực thi mới (shellcode), kẻ tấn công sẽ tìm kiếm các đoạn mã nhỏ đã có sẵn trong bộ nhớ của chương trình (trong section `.text` hoặc các thư viện được nạp) và xâu chuỗi chúng lại với nhau để thực hiện hành vi mong muốn.
 
@@ -432,7 +498,7 @@ Kịch bản tấn công:
 
 *(Chi tiết về ROP sẽ được đề cập trong một module khác, nhưng đây là mối liên hệ trực tiếp của nó với shellcoding).*
 
-#### 2. Lợi Dụng Trình Biên Dịch Just-In-Time (JIT)
+#### 3. Lợi Dụng Trình Biên Dịch Just-In-Time (JIT)
 
 Các ngôn ngữ thông dịch hiệu năng cao (JavaScript trong trình duyệt, Java, LuaJIT, PyPy) sử dụng **JIT Compilation**. JIT compiler dịch mã bytecode hoặc mã kịch bản thành mã máy gốc (native machine code) ngay trong lúc chương trình đang chạy để tăng tốc độ.
 
