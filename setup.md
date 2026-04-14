@@ -2,6 +2,7 @@
 
 * Tìm hiểu cách để dùng lệnh `ssh` đến server, từ đó tạo file key và key.pub
 * Cài đặt 1 file template để tải hết các file cần thiết từ server của pwn.college về máy local
+
 **get_pwn.sh**
 ```shell
 #!/bin/bash
